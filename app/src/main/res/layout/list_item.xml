@@ -36,6 +36,7 @@
         android:layout_alignParentEnd="true"
         android:layout_alignParentRight="true"
         android:hint="@string/store_price_box"
+        
         android:textSize="20sp"/>
 
 
