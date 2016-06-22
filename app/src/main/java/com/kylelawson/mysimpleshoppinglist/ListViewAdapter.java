@@ -8,7 +8,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
-import android.widget.TextView;
+import android.widget.NumberPicker;
 
 import java.util.List;
 
@@ -22,13 +22,25 @@ public class ListViewAdapter extends RecyclerView.Adapter<ListViewAdapter.ViewHo
     public static class ViewHolder extends RecyclerView.ViewHolder{
 
         private String current = "";
-        public TextView nameTextView;
+        public EditText nameTextView;
         public EditText priceEditView;
+        public NumberPicker quantityPicker;
+        public int quantity;
+        public double price;
 
         public ViewHolder(View itemView) {
             super(itemView);
 
-            nameTextView = (TextView) itemView.findViewById(R.id.list_item_name);
+            nameTextView = (EditText) itemView.findViewById(R.id.list_item_name);
+            quantityPicker = (NumberPicker) itemView.findViewById(R.id.quantity_picker);
+
+            quantityPicker.setOnScrollListener(new NumberPicker.OnScrollListener() {
+                @Override
+                public void onScrollStateChange(NumberPicker numberPicker, int i) {
+                    quantity = i;
+                }
+            });
+
             priceEditView = (EditText) itemView.findViewById(R.id.list_item_price);
             priceEditView.addTextChangedListener(new TextWatcher() {
                 @Override
@@ -46,6 +58,7 @@ public class ListViewAdapter extends RecyclerView.Adapter<ListViewAdapter.ViewHo
                     if(!editable.toString().equals(current)){
                         priceEditView.removeTextChangedListener(this);
 
+                        price = Double.valueOf(priceEditView.getText().toString());
 
                         priceEditView.addTextChangedListener(this);
 
@@ -86,6 +99,10 @@ public class ListViewAdapter extends RecyclerView.Adapter<ListViewAdapter.ViewHo
         viewHolder.nameTextView.setText("");
 
         viewHolder.priceEditView.setText("");
+
+        viewHolder.quantityPicker.setMaxValue(20);
+        viewHolder.quantityPicker.setMinValue(1);
+
 
     }
 

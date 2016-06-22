@@ -4,6 +4,10 @@
     <string name="settings">Settings</string>
     <string name="currency">$</string>
     <string name="fab">+</string>
-    <string name="store_price_box">Store Price</string>
+    <string name="store_price_box">Price</string>
+    <string name="x_for_quantity">X</string>
+    <string name="quantity_hint">Quantity</string>
+    <string name="item_name">Item Name</string>
+    <string name="how_many">How Many:</string>
 
 </resources>
