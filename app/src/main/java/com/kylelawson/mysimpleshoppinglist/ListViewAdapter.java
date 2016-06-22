@@ -10,7 +10,9 @@ import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.NumberPicker;
 
+import java.text.NumberFormat;
 import java.util.List;
+
 
 
 /**
@@ -54,11 +56,20 @@ public class ListViewAdapter extends RecyclerView.Adapter<ListViewAdapter.ViewHo
                 }
 
                 @Override
-                public void afterTextChanged(Editable editable) {
+                public synchronized void afterTextChanged(Editable editable) {
                     if(!editable.toString().equals(current)){
                         priceEditView.removeTextChangedListener(this);
 
-                        price = Double.valueOf(priceEditView.getText().toString());
+                        String digits = editable.toString().replaceAll("\\D", "");
+                        NumberFormat nf = NumberFormat.getCurrencyInstance();
+                        try{
+                            String formatted = nf.format(Double.parseDouble(digits)/100);
+                            editable.replace(0, editable.length(), formatted);
+                            price = Double.valueOf(editable.toString());
+                        } catch (NumberFormatException nfe) {
+                            editable.clear();
+                        }
+
 
                         priceEditView.addTextChangedListener(this);
 
