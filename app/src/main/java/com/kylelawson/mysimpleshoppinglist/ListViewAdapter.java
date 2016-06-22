@@ -10,7 +10,6 @@ import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.TextView;
 
-import java.text.NumberFormat;
 import java.util.List;
 
 
@@ -47,20 +46,7 @@ public class ListViewAdapter extends RecyclerView.Adapter<ListViewAdapter.ViewHo
                     if(!editable.toString().equals(current)){
                         priceEditView.removeTextChangedListener(this);
 
-                        String replacingString = String.format("[%s,.\\s]", NumberFormat.getCurrencyInstance().getCurrency().getSymbol());
-                        String cleanString = editable.toString().replaceAll(replacingString, "");
 
-                        double parsed;
-                        try{
-                            parsed = Double.parseDouble(cleanString);
-                        }catch (NumberFormatException e){
-                            parsed = 0.00;
-                        }
-
-                        current = NumberFormat.getCurrencyInstance().format(parsed/100);
-
-                        priceEditView.setText(current);
-                        priceEditView.setSelection(current.length());
                         priceEditView.addTextChangedListener(this);
 
                     }
@@ -94,14 +80,12 @@ public class ListViewAdapter extends RecyclerView.Adapter<ListViewAdapter.ViewHo
     }
 
     @Override
-    public void onBindViewHolder(ListViewAdapter.ViewHolder viewHolder, int posiiton){
-        ShoppingListItem shoppingListItem = listItem.get(posiiton);
+    public void onBindViewHolder(ListViewAdapter.ViewHolder viewHolder, int position){
+        ShoppingListItem shoppingListItem = listItem.get(position);
 
-        TextView itemName = viewHolder.nameTextView;
-        itemName.setText(shoppingListItem.getName());
+        viewHolder.nameTextView.setText("");
 
-        EditText priceEdit = viewHolder.priceEditView;
-
+        viewHolder.priceEditView.setText("");
 
     }
 

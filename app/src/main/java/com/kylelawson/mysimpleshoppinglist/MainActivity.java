@@ -47,7 +47,7 @@ public class MainActivity extends AppCompatActivity {
         addItemFAB.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                shoppingListNameArray.add(new ShoppingListItem("",0.00));
+                shoppingListNameArray.add(new ShoppingListItem("", 0.00));
                 adapter.notifyItemInserted(shoppingListNameArray.size());
             }
         });
@@ -63,8 +63,8 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction) {
                 int swipedPosition = viewHolder.getAdapterPosition();
-                adapter.notifyItemRemoved(swipedPosition);
                 shoppingListNameArray.remove(swipedPosition);
+                adapter.notifyItemRemoved(swipedPosition);
             }
         };
 
