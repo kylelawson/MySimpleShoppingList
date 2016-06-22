@@ -10,6 +10,7 @@ import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import java.text.NumberFormat;
 import java.util.List;
 
 
@@ -18,8 +19,10 @@ import java.util.List;
  */
 public class ListViewAdapter extends RecyclerView.Adapter<ListViewAdapter.ViewHolder> {
 
+
     public static class ViewHolder extends RecyclerView.ViewHolder{
 
+        private String current = "";
         public TextView nameTextView;
         public EditText priceEditView;
 
@@ -41,9 +44,29 @@ public class ListViewAdapter extends RecyclerView.Adapter<ListViewAdapter.ViewHo
 
                 @Override
                 public void afterTextChanged(Editable editable) {
+                    if(!editable.toString().equals(current)){
+                        priceEditView.removeTextChangedListener(this);
 
+                        String replacingString = String.format("[%s,.\\s]", NumberFormat.getCurrencyInstance().getCurrency().getSymbol());
+                        String cleanString = editable.toString().replaceAll(replacingString, "");
+
+                        double parsed;
+                        try{
+                            parsed = Double.parseDouble(cleanString);
+                        }catch (NumberFormatException e){
+                            parsed = 0.00;
+                        }
+
+                        current = NumberFormat.getCurrencyInstance().format(parsed/100);
+
+                        priceEditView.setText(current);
+                        priceEditView.setSelection(current.length());
+                        priceEditView.addTextChangedListener(this);
+
+                    }
                 }
             });
+
         }
     }
 
@@ -78,6 +101,7 @@ public class ListViewAdapter extends RecyclerView.Adapter<ListViewAdapter.ViewHo
         itemName.setText(shoppingListItem.getName());
 
         EditText priceEdit = viewHolder.priceEditView;
+
 
     }
 
