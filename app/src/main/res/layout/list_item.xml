@@ -4,7 +4,8 @@
                 android:layout_width="match_parent"
                 android:layout_marginTop="5dp"
                 android:layout_height="90dp"
-                android:paddingTop="5dp">
+                android:paddingTop="5dp"
+    android:background="@color/itemBackground">
 
     <EditText
         android:layout_width="wrap_content"
@@ -20,7 +21,8 @@
         android:layout_toLeftOf="@+id/list_item_price"
         android:layout_alignBottom="@+id/list_item_price"
         android:background="@android:color/transparent"
-        android:hint="@string/item_name"/>
+        android:hint="@string/item_name"
+        android:imeOptions="actionDone"/>
 
     <EditText
         android:id="@+id/list_item_price"
@@ -33,7 +35,8 @@
         android:layout_alignParentRight="true"
         android:inputType="numberDecimal"
         android:hint="@string/store_price_box"
-        android:textSize="20sp"/>
+        android:textSize="20sp"
+        android:imeOptions="actionDone"/>
 
     <NumberPicker
         android:id="@+id/quantity_picker"
@@ -41,7 +44,8 @@
         android:layout_height="50dp"
         android:layout_below="@+id/list_item_price"
         android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true"/>
+        android:layout_alignParentEnd="true"
+        />
 
     <TextView
         android:layout_width="wrap_content"

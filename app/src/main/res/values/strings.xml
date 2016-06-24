@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name">My Simple Shopping List</string>
 
-    <string name="settings">Settings</string>
+    <string name="about">About</string>
     <string name="currency">$</string>
     <string name="fab">+</string>
     <string name="store_price_box">Price</string>
@@ -9,5 +9,13 @@
     <string name="quantity_hint">Quantity</string>
     <string name="item_name">Item Name</string>
     <string name="how_many">How Many:</string>
+
+    <string-array name="about_credit">
+        <item>My Simple Shopping List</item>
+        <item>This is just a demonstration of some basic coding techniques and patterns.</item>
+        <item>Thanks for checking it out.</item>
+    </string-array>
+
+    <string name="about_description"/>
 
 </resources>
