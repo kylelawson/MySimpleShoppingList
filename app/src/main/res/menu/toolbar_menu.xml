@@ -4,9 +4,14 @@
       xmlns:app="http://schemas.android.com/tools"
     >
 
+    <item android2:id="@+id/clear_list"
+          android2:icon="@drawable/ic_clear_list"
+          android2:title="@string/clear_list"
+          app:showAsAction="ifRoom" />
+
     <item android2:id="@+id/settings"
           android:title="@string/about"
           app:showAsAction="never"
-          android2:title="@string/about"/>
+          android2:title="@string/about" />
 
 </menu>

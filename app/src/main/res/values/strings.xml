@@ -17,5 +17,8 @@
     </string-array>
 
     <string name="about_description"/>
+    <string name="clear_list">Clear</string>
+    <string name="quantity_editable">Quantity</string>
+    <string name="swipe_left_to_remove">Swipe Left to Remove</string>
 
 </resources>

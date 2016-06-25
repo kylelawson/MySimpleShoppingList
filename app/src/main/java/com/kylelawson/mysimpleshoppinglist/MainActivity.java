@@ -1,6 +1,7 @@
 package com.kylelawson.mysimpleshoppinglist;
 
 import android.content.DialogInterface;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AlertDialog;
@@ -12,6 +13,7 @@ import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.TextView;
 
 import java.util.ArrayList;
 
@@ -24,11 +26,25 @@ public class MainActivity extends AppCompatActivity {
     ArrayList<ShoppingListItem> shoppingListNameArray;
 
     FloatingActionButton addItemFAB;
+    TextView totalPriceView;
+
+    Double totalPrice = 0.00;
+
+    SharedPreferences listSize;
+    SharedPreferences listName;
+    SharedPreferences listPrice;
+    SharedPreferences listQuantity;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        //SharedPreferences instantiation
+        listSize = getSharedPreferences("SIZE", MODE_PRIVATE);
+        listName = getSharedPreferences("NAME", MODE_PRIVATE);
+        listPrice = getSharedPreferences("PRICE", MODE_PRIVATE);
+        listQuantity = getSharedPreferences("QUANTITY", MODE_PRIVATE);
 
         //For the toolbar
         toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -36,9 +52,26 @@ public class MainActivity extends AppCompatActivity {
         getSupportActionBar().show();
 
         //Listview
-        shoppingListNameArray = ShoppingListItem.createShoppingItem(1);
+        shoppingListNameArray = ShoppingListItem.createShoppingItem(0);
 
-        adapter = new ListViewAdapter(this, shoppingListNameArray);
+        adapter = new ListViewAdapter(this, shoppingListNameArray, new ListViewAdapter.Calculate() {
+            @Override
+            public void calculatePrice() {
+                double tempPrice = 0.00;
+                int tempQuantity = 0;
+
+                for(int i = 0; i < shoppingListNameArray.size();i++){
+
+                    tempPrice = shoppingListNameArray.get(i).price;
+                    tempQuantity = shoppingListNameArray.get(i).quantity;
+
+                    totalPrice += (tempPrice * tempQuantity);
+                }
+
+                totalPriceView.setText(totalPrice.toString());
+            }
+        });
+
         shoppingList = (RecyclerView) findViewById(R.id.parent_list);
         shoppingList.setAdapter(adapter);
         shoppingList.setLayoutManager(new LinearLayoutManager(this));
@@ -52,10 +85,32 @@ public class MainActivity extends AppCompatActivity {
         addItemFAB.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                shoppingListNameArray.add(new ShoppingListItem("", 0.00));
+
+                ShoppingListItem tempItem = new ShoppingListItem("", 0.00, 0);
+                shoppingListNameArray.add(tempItem);
+
+                SharedPreferences.Editor editor = listName.edit();
+                editor.putString("" + (shoppingListNameArray.size() - 1), "");
+                editor.apply();
+
+                editor = listSize.edit();
+                editor.putInt("0", shoppingListNameArray.size());
+                editor.apply();
+
+                editor = listPrice.edit();
+                editor.putString("" + (shoppingListNameArray.size() - 1), "0.00");
+                editor.apply();
+
+                editor = listQuantity.edit();
+                editor.putInt("" + (shoppingListNameArray.size() - 1), 0);
+                editor.apply();
+
                 adapter.notifyItemInserted(shoppingListNameArray.size());
             }
         });
+
+        //Total price text view
+        totalPriceView = (TextView) findViewById(R.id.total_price_view);
     }
 
     //Adds the menu
@@ -87,6 +142,31 @@ public class MainActivity extends AppCompatActivity {
                         }).show();
                 return true;
 
+            case R.id.clear_list:
+
+                //Clear the object array and the recycler view
+                shoppingListNameArray.clear();
+                adapter.notifyDataSetChanged();
+
+                //Clear the persistence data
+                SharedPreferences.Editor editor = listQuantity.edit();
+                editor.clear();
+                editor.apply();
+
+                editor = listPrice.edit();
+                editor.clear();
+                editor.apply();
+
+                editor = listSize.edit();
+                editor.clear();
+                editor.apply();
+
+                editor = listName.edit();
+                editor.clear();
+                editor.apply();
+
+                return true;
+
             default:
                 return super.onOptionsItemSelected(item);
         }
@@ -104,7 +184,11 @@ public class MainActivity extends AppCompatActivity {
             public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction) {
                 int swipedPosition = viewHolder.getAdapterPosition();
                 shoppingListNameArray.remove(swipedPosition);
-                adapter.notifyItemRemoved(swipedPosition);
+                adapter.notifyItemInserted(swipedPosition);
+
+                SharedPreferences.Editor editor = listName.edit();
+                editor.remove("" + swipedPosition);
+                editor.apply();
             }
         };
 

@@ -8,11 +8,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
-import android.widget.NumberPicker;
 
 import java.text.NumberFormat;
-import java.util.List;
-
+import java.util.ArrayList;
 
 
 /**
@@ -20,26 +18,50 @@ import java.util.List;
  */
 public class ListViewAdapter extends RecyclerView.Adapter<ListViewAdapter.ViewHolder> {
 
+    private ArrayList<ShoppingListItem> listItem;
+    private Context mContext;
+    private static Calculate calculate;
 
+    //Uses viewholder method in order to customize adapter
     public static class ViewHolder extends RecyclerView.ViewHolder{
 
-        private String current = "";
+        private String currentPrice = "";
+        private String currentQuantity = "";
         public EditText nameTextView;
         public EditText priceEditView;
-        public NumberPicker quantityPicker;
-        public int quantity;
-        public double price;
+        public EditText quantityPicker;
+        public int quantity = 0;
+        public double price = 0.00;
 
         public ViewHolder(View itemView) {
             super(itemView);
 
             nameTextView = (EditText) itemView.findViewById(R.id.list_item_name);
-            quantityPicker = (NumberPicker) itemView.findViewById(R.id.quantity_picker);
 
-            quantityPicker.setOnScrollListener(new NumberPicker.OnScrollListener() {
+            quantityPicker = (EditText) itemView.findViewById(R.id.quantity_picker);
+            quantityPicker.addTextChangedListener(new TextWatcher() {
                 @Override
-                public void onScrollStateChange(NumberPicker numberPicker, int i) {
-                    quantity = i;
+                public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+                }
+
+                @Override
+                public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+                }
+
+                @Override
+                public void afterTextChanged(Editable editable) {
+
+                    quantityPicker.removeTextChangedListener(this);
+
+                    if(!editable.toString().equals(currentQuantity)){
+                        quantity = Integer.parseInt(String.valueOf(editable));
+                    }
+
+                    calculate.calculatePrice();
+                    quantityPicker.addTextChangedListener(this);
+
                 }
             });
 
@@ -57,7 +79,7 @@ public class ListViewAdapter extends RecyclerView.Adapter<ListViewAdapter.ViewHo
 
                 @Override
                 public synchronized void afterTextChanged(Editable editable) {
-                    if(!editable.toString().equals(current)){
+                    if(!editable.toString().equals(currentPrice)){
                         priceEditView.removeTextChangedListener(this);
 
                         String digits = editable.toString().replaceAll("\\D", "");
@@ -65,27 +87,27 @@ public class ListViewAdapter extends RecyclerView.Adapter<ListViewAdapter.ViewHo
                         try{
                             String formatted = nf.format(Double.parseDouble(digits)/100);
                             editable.replace(0, editable.length(), formatted);
-                            price = Double.valueOf(editable.toString());
+                            price = Double.valueOf(String.valueOf(editable));
                         } catch (NumberFormatException nfe) {
                             editable.clear();
                         }
 
-
+                        calculate.calculatePrice();
                         priceEditView.addTextChangedListener(this);
-
                     }
                 }
             });
 
         }
+
+
     }
 
-    private List<ShoppingListItem> listItem;
-    private Context mContext;
-
-    public ListViewAdapter(Context context, List<ShoppingListItem> item){
+    public ListViewAdapter(Context context, ArrayList<ShoppingListItem> item, Calculate calculate){
         listItem = item;
         this.mContext = context;
+        ListViewAdapter.calculate = calculate;
+
     }
 
     private Context getContext(){
@@ -100,6 +122,7 @@ public class ListViewAdapter extends RecyclerView.Adapter<ListViewAdapter.ViewHo
         View itemView = inflater.inflate(R.layout.list_item, parent, false);
 
         ViewHolder viewHolder = new ViewHolder(itemView);
+
         return viewHolder;
     }
 
@@ -107,20 +130,22 @@ public class ListViewAdapter extends RecyclerView.Adapter<ListViewAdapter.ViewHo
     public void onBindViewHolder(ListViewAdapter.ViewHolder viewHolder, int position){
         ShoppingListItem shoppingListItem = listItem.get(position);
 
-        viewHolder.nameTextView.setText("");
+        viewHolder.nameTextView.setText(shoppingListItem.name);
 
-        viewHolder.priceEditView.setText("");
+        viewHolder.priceEditView.setText(shoppingListItem.price.toString());
 
-        viewHolder.quantityPicker.setMaxValue(20);
-        viewHolder.quantityPicker.setMinValue(1);
-
-
+        viewHolder.quantityPicker.setText(shoppingListItem.quantity);
     }
 
     @Override
     public int getItemCount(){
         return listItem.size();
     }
+
+    public interface Calculate{
+        void calculatePrice();
+    }
+
 
 
 }
