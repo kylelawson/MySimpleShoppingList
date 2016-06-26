@@ -148,6 +148,7 @@ public class MainActivity extends AppCompatActivity {
                 //Clear the object array and the recycler view
                 shoppingListNameArray.clear();
                 adapter.notifyDataSetChanged();
+                totalPriceCalculation();
 
                 //Clear the persistence data
                 SharedPreferences.Editor editor = listQuantity.edit();

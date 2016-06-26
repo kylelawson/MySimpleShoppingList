@@ -44,7 +44,6 @@ public class ListViewAdapter extends RecyclerView.Adapter<ListViewAdapter.ViewHo
 
         }
 
-
     }
 
     public ListViewAdapter(Context context, ArrayList<ShoppingListItem> item){
@@ -65,7 +64,11 @@ public class ListViewAdapter extends RecyclerView.Adapter<ListViewAdapter.ViewHo
 
         View itemView = inflater.inflate(R.layout.list_item, parent, false);
 
-        return new ViewHolder(itemView);
+        ViewHolder viewholder = new ViewHolder(itemView);
+
+        //Makes sure the view holder doesn't get recycled ensuring the list remains intact
+        viewholder.setIsRecyclable(false);
+        return viewholder;
 
     }
 
@@ -74,6 +77,22 @@ public class ListViewAdapter extends RecyclerView.Adapter<ListViewAdapter.ViewHo
         final ShoppingListItem shoppingListItem = listItem.get(position);
 
         viewHolder.nameTextView.setText(shoppingListItem.getName());
+        viewHolder.nameTextView.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+                shoppingListItem.name = editable.toString();
+            }
+        });
 
         if(shoppingListItem.price == 0.00){
             viewHolder.priceEditView.setText("");
@@ -159,7 +178,6 @@ public class ListViewAdapter extends RecyclerView.Adapter<ListViewAdapter.ViewHo
 
             }
         });
-
 
     }
 
