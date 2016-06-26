@@ -20,18 +20,18 @@ public class ListViewAdapter extends RecyclerView.Adapter<ListViewAdapter.ViewHo
 
     private ArrayList<ShoppingListItem> listItem;
     private Context mContext;
-    private static Calculate calculate;
+
+    private String currentPrice;
+    private String currentQuantity;
+
+    NumberFormat format = NumberFormat.getCurrencyInstance();
 
     //Uses viewholder method in order to customize adapter
     public static class ViewHolder extends RecyclerView.ViewHolder{
 
-        private String currentPrice = "";
-        private String currentQuantity = "";
         public EditText nameTextView;
         public EditText priceEditView;
         public EditText quantityPicker;
-        public int quantity = 0;
-        public double price = 0.00;
 
         public ViewHolder(View itemView) {
             super(itemView);
@@ -39,74 +39,18 @@ public class ListViewAdapter extends RecyclerView.Adapter<ListViewAdapter.ViewHo
             nameTextView = (EditText) itemView.findViewById(R.id.list_item_name);
 
             quantityPicker = (EditText) itemView.findViewById(R.id.quantity_picker);
-            quantityPicker.addTextChangedListener(new TextWatcher() {
-                @Override
-                public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
-                }
-
-                @Override
-                public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
-                }
-
-                @Override
-                public void afterTextChanged(Editable editable) {
-
-                    quantityPicker.removeTextChangedListener(this);
-
-                    if(!editable.toString().equals(currentQuantity)){
-                        quantity = Integer.parseInt(String.valueOf(editable));
-                    }
-
-                    calculate.calculatePrice();
-                    quantityPicker.addTextChangedListener(this);
-
-                }
-            });
 
             priceEditView = (EditText) itemView.findViewById(R.id.list_item_price);
-            priceEditView.addTextChangedListener(new TextWatcher() {
-                @Override
-                public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
-                }
-
-                @Override
-                public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
-                }
-
-                @Override
-                public synchronized void afterTextChanged(Editable editable) {
-                    if(!editable.toString().equals(currentPrice)){
-                        priceEditView.removeTextChangedListener(this);
-
-                        String digits = editable.toString().replaceAll("\\D", "");
-                        NumberFormat nf = NumberFormat.getCurrencyInstance();
-                        try{
-                            String formatted = nf.format(Double.parseDouble(digits)/100);
-                            editable.replace(0, editable.length(), formatted);
-                            price = Double.valueOf(String.valueOf(editable));
-                        } catch (NumberFormatException nfe) {
-                            editable.clear();
-                        }
-
-                        calculate.calculatePrice();
-                        priceEditView.addTextChangedListener(this);
-                    }
-                }
-            });
 
         }
 
 
     }
 
-    public ListViewAdapter(Context context, ArrayList<ShoppingListItem> item, Calculate calculate){
+    public ListViewAdapter(Context context, ArrayList<ShoppingListItem> item){
+
         listItem = item;
         this.mContext = context;
-        ListViewAdapter.calculate = calculate;
 
     }
 
@@ -121,31 +65,107 @@ public class ListViewAdapter extends RecyclerView.Adapter<ListViewAdapter.ViewHo
 
         View itemView = inflater.inflate(R.layout.list_item, parent, false);
 
-        ViewHolder viewHolder = new ViewHolder(itemView);
+        return new ViewHolder(itemView);
 
-        return viewHolder;
     }
 
     @Override
-    public void onBindViewHolder(ListViewAdapter.ViewHolder viewHolder, int position){
-        ShoppingListItem shoppingListItem = listItem.get(position);
+    public void onBindViewHolder(final ListViewAdapter.ViewHolder viewHolder, int position){
+        final ShoppingListItem shoppingListItem = listItem.get(position);
 
-        viewHolder.nameTextView.setText(shoppingListItem.name);
+        viewHolder.nameTextView.setText(shoppingListItem.getName());
 
-        viewHolder.priceEditView.setText(shoppingListItem.price.toString());
+        if(shoppingListItem.price == 0.00){
+            viewHolder.priceEditView.setText("");
+        }else {
+            viewHolder.priceEditView.setText(format.format(shoppingListItem.price));
+        }
 
-        viewHolder.quantityPicker.setText(shoppingListItem.quantity);
+        currentPrice = shoppingListItem.getPrice();
+        viewHolder.priceEditView.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+                if(!editable.toString().equals(currentPrice)){
+                    viewHolder.priceEditView.removeTextChangedListener(this);
+
+                    String digits = editable.toString().replaceAll("\\D", "");
+                    NumberFormat nf = NumberFormat.getCurrencyInstance();
+
+                    try{
+
+                        String formatted = nf.format(Double.parseDouble(digits)/100);
+                        editable.replace(0, editable.length(), formatted);
+                        shoppingListItem.price = Double.valueOf(String.valueOf(editable));
+
+                    } catch (NumberFormatException nfe) {
+
+                        editable.clear();
+
+                    }
+
+                    viewHolder.priceEditView.addTextChangedListener(this);
+
+                }
+            }
+        });
+
+        if(shoppingListItem.quantity == 0){
+
+            viewHolder.quantityPicker.setText("");
+
+        }else {
+
+            viewHolder.quantityPicker.setText(shoppingListItem.getQuantity());
+
+        }
+
+        currentQuantity = shoppingListItem.getQuantity();
+        viewHolder.quantityPicker.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+
+                viewHolder.quantityPicker.removeTextChangedListener(this);
+
+                if(!editable.toString().equals(currentQuantity) && !editable.toString().equals("")){
+
+                    shoppingListItem.quantity = Integer.valueOf(String.valueOf(editable));
+
+                }else{
+
+                    shoppingListItem.quantity = 0;
+                }
+
+                viewHolder.quantityPicker.addTextChangedListener(this);
+
+            }
+        });
+
+
     }
 
     @Override
     public int getItemCount(){
         return listItem.size();
     }
-
-    public interface Calculate{
-        void calculatePrice();
-    }
-
-
 
 }

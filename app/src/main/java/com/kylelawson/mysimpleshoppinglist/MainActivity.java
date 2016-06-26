@@ -13,8 +13,10 @@ import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ImageButton;
 import android.widget.TextView;
 
+import java.text.NumberFormat;
 import java.util.ArrayList;
 
 
@@ -27,6 +29,8 @@ public class MainActivity extends AppCompatActivity {
 
     FloatingActionButton addItemFAB;
     TextView totalPriceView;
+    ImageButton recalculateButton;
+    NumberFormat format;
 
     Double totalPrice = 0.00;
 
@@ -46,31 +50,21 @@ public class MainActivity extends AppCompatActivity {
         listPrice = getSharedPreferences("PRICE", MODE_PRIVATE);
         listQuantity = getSharedPreferences("QUANTITY", MODE_PRIVATE);
 
+        //Total price text view
+        totalPriceView = (TextView) findViewById(R.id.total_price_view);
+        format = NumberFormat.getCurrencyInstance();
+        totalPriceView.setText(String.valueOf(format.format(totalPrice)));
+
         //For the toolbar
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        getSupportActionBar().show();
+        //getSupportActionBar().show();
+
 
         //Listview
         shoppingListNameArray = ShoppingListItem.createShoppingItem(0);
 
-        adapter = new ListViewAdapter(this, shoppingListNameArray, new ListViewAdapter.Calculate() {
-            @Override
-            public void calculatePrice() {
-                double tempPrice = 0.00;
-                int tempQuantity = 0;
-
-                for(int i = 0; i < shoppingListNameArray.size();i++){
-
-                    tempPrice = shoppingListNameArray.get(i).price;
-                    tempQuantity = shoppingListNameArray.get(i).quantity;
-
-                    totalPrice += (tempPrice * tempQuantity);
-                }
-
-                totalPriceView.setText(totalPrice.toString());
-            }
-        });
+        adapter = new ListViewAdapter(this, shoppingListNameArray);
 
         shoppingList = (RecyclerView) findViewById(R.id.parent_list);
         shoppingList.setAdapter(adapter);
@@ -109,8 +103,15 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        //Total price text view
-        totalPriceView = (TextView) findViewById(R.id.total_price_view);
+        //Recalculate price button
+        recalculateButton = (ImageButton) findViewById(R.id.recalculate_button);
+        recalculateButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                totalPriceCalculation();
+            }
+        });
+
     }
 
     //Adds the menu
@@ -184,11 +185,9 @@ public class MainActivity extends AppCompatActivity {
             public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction) {
                 int swipedPosition = viewHolder.getAdapterPosition();
                 shoppingListNameArray.remove(swipedPosition);
-                adapter.notifyItemInserted(swipedPosition);
+                adapter.notifyItemRemoved(swipedPosition);
+                totalPriceCalculation();
 
-                SharedPreferences.Editor editor = listName.edit();
-                editor.remove("" + swipedPosition);
-                editor.apply();
             }
         };
 
@@ -196,4 +195,19 @@ public class MainActivity extends AppCompatActivity {
         itemTouchHelper.attachToRecyclerView(shoppingList);
     }
 
+    public void totalPriceCalculation(){
+        double tempPrice;
+        int tempQuantity;
+        totalPrice = 0.00;
+
+        for(int i = 0; i < shoppingListNameArray.size();i++){
+
+            tempPrice = shoppingListNameArray.get(i).price;
+            tempQuantity = shoppingListNameArray.get(i).quantity;
+
+            totalPrice += (tempPrice * tempQuantity);
+        }
+
+        totalPriceView.setText(String.valueOf(format.format(totalPrice)));
+    }
 }

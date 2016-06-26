@@ -20,11 +20,11 @@ public class ShoppingListItem {
         return name;
     }
 
-    public Double getPrice(){
-        return price;
+    public String getPrice(){
+        return price.toString();
     }
 
-    public int getQuantity() { return quantity; }
+    public String getQuantity() { return String.valueOf(quantity); }
 
 
 
