@@ -11,10 +11,8 @@
     <string name="how_many">How Many:</string>
 
     <string-array name="about_credit">
-        <item>My Simple Shopping List</item>
-        <item>This is just a demonstration of some basic coding techniques and patterns.</item>
-        <item>Thanks for checking it out.</item>
-        <item>App icon courtesy of <a href="http://www.freepik.com">FreePik</a></item>
+        <item>Designed and coded by Kyle Lawson</item>
+        <item>Launch icon courtesy of FreePik.com</item>
     </string-array>
 
     <string name="about_description"/>
