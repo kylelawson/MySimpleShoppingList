@@ -210,6 +210,8 @@ public class MainActivity extends AppCompatActivity {
 
     private void checkForPersistence() {
         if(listSize.getInt("0", 0) > 0){
+            shoppingListNameArray.clear();
+
             for(int i = 0; i < listSize.getInt("0", 1); i++){
 
                 shoppingListNameArray.add(new ShoppingListItem(listName.getString("" + i, ""),
@@ -244,11 +246,13 @@ public class MainActivity extends AppCompatActivity {
             }
 
         }
+
+        shoppingListNameArray.clear();
     }
 
     @Override
-    protected void onStop() {
-        super.onStop();
+    protected void onPause() {
+        super.onPause();
         saveListData();
     }
 
