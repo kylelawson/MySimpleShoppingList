@@ -36,16 +36,6 @@
         android:background="@color/colorPrimary"
         />
 
-    <ImageButton
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/recalculate_button"
-        android:src="@drawable/ic_recalculate"
-        android:layout_gravity="start|bottom"
-        android:background="@android:color/transparent"
-        android:layout_marginBottom="10dp"
-        android:padding="10dp"/>
-
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

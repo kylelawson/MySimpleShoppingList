@@ -14,12 +14,12 @@ import java.util.ArrayList;
 
 
 /**
- * Created by Kyle on 6/20/2016.
+ * Created by Kyle Lawson on 6/20/2016. All work is self-coded unless otherwise noted.
  */
 public class ListViewAdapter extends RecyclerView.Adapter<ListViewAdapter.ViewHolder> {
 
     private ArrayList<ShoppingListItem> listItem;
-    private Context mContext;
+    private Calculate calculateIt;
 
     private String currentPrice;
     private String currentQuantity;
@@ -46,15 +46,11 @@ public class ListViewAdapter extends RecyclerView.Adapter<ListViewAdapter.ViewHo
 
     }
 
-    public ListViewAdapter(Context context, ArrayList<ShoppingListItem> item){
+    public ListViewAdapter(ArrayList<ShoppingListItem> item, Calculate calculate){
 
         listItem = item;
-        this.mContext = context;
+        calculateIt = calculate;
 
-    }
-
-    private Context getContext(){
-        return mContext;
     }
 
     @Override
@@ -125,6 +121,7 @@ public class ListViewAdapter extends RecyclerView.Adapter<ListViewAdapter.ViewHo
                         String formatted = nf.format(Double.parseDouble(digits)/100);
                         editable.replace(0, editable.length(), formatted);
                         shoppingListItem.price = Double.valueOf(String.valueOf(editable));
+                        calculateIt.calculate();
 
                     } catch (NumberFormatException nfe) {
 
@@ -168,10 +165,12 @@ public class ListViewAdapter extends RecyclerView.Adapter<ListViewAdapter.ViewHo
                 if(!editable.toString().equals(currentQuantity) && !editable.toString().equals("")){
 
                     shoppingListItem.quantity = Integer.valueOf(String.valueOf(editable));
+                    calculateIt.calculate();
 
                 }else{
 
                     shoppingListItem.quantity = 0;
+                    calculateIt.calculate();
                 }
 
                 viewHolder.quantityPicker.addTextChangedListener(this);
@@ -184,6 +183,10 @@ public class ListViewAdapter extends RecyclerView.Adapter<ListViewAdapter.ViewHo
     @Override
     public int getItemCount(){
         return listItem.size();
+    }
+
+    public interface Calculate {
+        void calculate();
     }
 
 }

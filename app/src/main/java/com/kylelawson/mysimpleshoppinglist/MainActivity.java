@@ -13,7 +13,6 @@ import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.ImageButton;
 import android.widget.TextView;
 
 import java.text.NumberFormat;
@@ -29,7 +28,6 @@ public class MainActivity extends AppCompatActivity {
 
     FloatingActionButton addItemFAB;
     TextView totalPriceView;
-    ImageButton recalculateButton;
     NumberFormat format;
 
     Double totalPrice = 0.00;
@@ -64,7 +62,14 @@ public class MainActivity extends AppCompatActivity {
         //Listview
         shoppingListNameArray = ShoppingListItem.createShoppingItem(0);
 
-        adapter = new ListViewAdapter(this, shoppingListNameArray);
+        adapter = new ListViewAdapter(shoppingListNameArray, new ListViewAdapter.Calculate() {
+
+            @Override
+            public void calculate() {
+                totalPriceCalculation();
+            }
+
+        });
 
         shoppingList = (RecyclerView) findViewById(R.id.parent_list);
         shoppingList.setAdapter(adapter);
@@ -100,15 +105,6 @@ public class MainActivity extends AppCompatActivity {
                 editor.apply();
 
                 adapter.notifyItemInserted(shoppingListNameArray.size());
-            }
-        });
-
-        //Recalculate price button
-        recalculateButton = (ImageButton) findViewById(R.id.recalculate_button);
-        recalculateButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                totalPriceCalculation();
             }
         });
 
@@ -160,7 +156,7 @@ public class MainActivity extends AppCompatActivity {
                 editor.apply();
 
                 editor = listSize.edit();
-                editor.clear();
+                editor.putInt("0", 0);
                 editor.apply();
 
                 editor = listName.edit();
@@ -210,5 +206,56 @@ public class MainActivity extends AppCompatActivity {
         }
 
         totalPriceView.setText(String.valueOf(format.format(totalPrice)));
+    }
+
+    private void checkForPersistence() {
+        if(listSize.getInt("0", 0) > 0){
+            for(int i = 0; i < listSize.getInt("0", 1); i++){
+
+                shoppingListNameArray.add(new ShoppingListItem(listName.getString("" + i, ""),
+                        Double.valueOf(listPrice.getString("" + i, "0.00")),
+                        listQuantity.getInt("" + i, 0)));
+            }
+
+            adapter.notifyDataSetChanged();
+        }
+    }
+
+    private void saveListData(){
+        SharedPreferences.Editor editor;
+
+        if(shoppingListNameArray.size() > 0){
+            editor = listSize.edit();
+            editor.putInt("0", shoppingListNameArray.size());
+            editor.apply();
+
+            for(int i = 0; i < shoppingListNameArray.size(); i++) {
+                editor = listName.edit();
+                editor.putString("" + i, shoppingListNameArray.get(i).getName());
+                editor.apply();
+
+                editor = listQuantity.edit();
+                editor.putInt("" + i, shoppingListNameArray.get(i).quantity);
+                editor.apply();
+
+                editor = listPrice.edit();
+                editor.putString("" + i, shoppingListNameArray.get(i).getPrice());
+                editor.apply();
+            }
+
+        }
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        saveListData();
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        checkForPersistence();
+        totalPriceCalculation();
     }
 }
