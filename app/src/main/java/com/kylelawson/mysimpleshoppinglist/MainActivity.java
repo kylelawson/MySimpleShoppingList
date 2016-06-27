@@ -1,5 +1,6 @@
 package com.kylelawson.mysimpleshoppinglist;
 
+import android.app.Activity;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -13,6 +14,7 @@ import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.TextView;
 
 import java.text.NumberFormat;
@@ -58,8 +60,6 @@ public class MainActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         //getSupportActionBar().show();
 
-
-        //Listview
         shoppingListNameArray = ShoppingListItem.createShoppingItem(0);
 
         adapter = new ListViewAdapter(shoppingListNameArray, new ListViewAdapter.Calculate() {
@@ -72,6 +72,22 @@ public class MainActivity extends AppCompatActivity {
         });
 
         shoppingList = (RecyclerView) findViewById(R.id.parent_list);
+        shoppingList.setOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
+                super.onScrollStateChanged(recyclerView, newState);
+
+                if(newState == 1){
+
+                    InputMethodManager inputMethodManger = (InputMethodManager)getSystemService(Activity
+                            .INPUT_METHOD_SERVICE);
+                    inputMethodManger.hideSoftInputFromWindow(recyclerView.getWindowToken(), 0);
+
+                }
+            }
+        });
+
+
         shoppingList.setAdapter(adapter);
         shoppingList.setLayoutManager(new LinearLayoutManager(this));
 
@@ -261,5 +277,6 @@ public class MainActivity extends AppCompatActivity {
         super.onStart();
         checkForPersistence();
         totalPriceCalculation();
+
     }
 }
